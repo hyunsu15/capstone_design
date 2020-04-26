@@ -60,6 +60,7 @@ const Nav = (props) => {
           검색
         </Button>
       </Box>
+
       {categoryComponent()}
     </div>
   );

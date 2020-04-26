@@ -20,7 +20,6 @@ const menu = () => {
 
   return (
     <div>
-      {/* <Nav /> */}
       {console.dir(category)}
       {router.query.menu}
       {listComponent(list)}
