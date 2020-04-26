@@ -46,7 +46,7 @@ const listItem = (franchise, validData) => {
 
   if (validData)
     return (
-      <Paper>
+      <Paper variant="outlined" square>
         <Box>{franchise}</Box>
         설명:{category[franchise]['설명']}
         <Button
@@ -60,7 +60,7 @@ const listItem = (franchise, validData) => {
     );
   else
     return (
-      <Paper>
+      <Paper variant="outlined" square>
         {franchise}
         개발중..
       </Paper>
