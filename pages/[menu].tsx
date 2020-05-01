@@ -4,7 +4,7 @@ import Nav, { createOption, searchState } from '../components/nav';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { type } from 'os';
-import { category } from '../practice/정현수/fakeDB';
+import { kind } from '../practice/정현수/fakeDB';
 import {
   AppBar,
   Typography,
@@ -16,55 +16,45 @@ import {
 
 const menu = () => {
   const router = useRouter();
-  const list = category['kind'][router.query.menu];
-
+  const pageName = router.query.menu;
   return (
     <div>
-      {console.dir(category)}
-      {router.query.menu}
-      {listComponent(list)}
+      {pageName}
+
+      {listComponent(pageName)}
     </div>
   );
 };
 
 //   {typeof list == 'object' && listComponent(list)}
 
-const listComponent = (list) => {
+const listComponent = (pageName) => {
   return (
-    typeof list == 'object' &&
-    list.map((franchise) => {
-      return typeof category[franchise] == 'object'
-        ? listItem(franchise, true)
-        : listItem(franchise, false);
-    })
+    typeof kind == 'object' &&
+    typeof pageName == 'string' &&
+    Object.keys(kind[pageName]).map((franchise) =>
+      listItem(pageName, franchise)
+    )
   );
 };
 
-const listItem = (franchise, validData) => {
+const listItem = (pageName, franchise) => {
   const isNotContain = () =>
     searchState('franchise').indexOf(franchise) == -1 ? true : false;
 
-  if (validData)
-    return (
-      <Paper variant="outlined" square>
-        <Box>{franchise}</Box>
-        설명:{category[franchise]['설명']}
-        <Button
-          onClick={(e) => {
-            if (isNotContain()) createOption('franchise', franchise);
-          }}
-        >
-          추가
-        </Button>
-      </Paper>
-    );
-  else
-    return (
-      <Paper variant="outlined" square>
-        {franchise}
-        개발중..
-      </Paper>
-    );
+  return (
+    <Paper variant="outlined" square>
+      <Box>{franchise}</Box>
+      설명:{kind[pageName][franchise]}
+      <Button
+        onClick={(e) => {
+          if (isNotContain()) createOption('franchise', franchise, pageName);
+        }}
+      >
+        추가
+      </Button>
+    </Paper>
+  );
 };
 
 export default menu;

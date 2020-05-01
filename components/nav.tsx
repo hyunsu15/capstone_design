@@ -1,7 +1,7 @@
 import React, { useState, useRef, Fragment, useEffect } from 'react';
 import Link from 'next/link';
 import { AppBar, Typography, Button, Box, TextField } from '@material-ui/core';
-import { category } from '../practice/정현수/fakeDB';
+import { kind } from '../practice/정현수/fakeDB';
 import Router from 'next/router';
 
 export const useLocal = () => {
@@ -9,7 +9,7 @@ export const useLocal = () => {
   return [local, setLocal];
 };
 
-export const createOption = (id, text) => {
+export const createOption = (parentId, text, id?) => {
   const child = document.createElement('div');
   const childText = document.createElement('div');
   const button = document.createElement('span');
@@ -17,8 +17,8 @@ export const createOption = (id, text) => {
   childText.innerHTML = text + ' ';
   childText.appendChild(button);
   childText.className = 'h3';
-  childText.id = text;
-  document.getElementById(`nav-${id}`).appendChild(childText);
+  if (id) childText.setAttribute('id', id);
+  document.getElementById(`nav-${parentId}`).appendChild(childText);
 
   button.onclick = () => {
     button.parentElement.parentElement.removeChild(button.parentElement);
@@ -26,9 +26,7 @@ export const createOption = (id, text) => {
 };
 
 const Nav = (props) => {
-  const [local, setLocal] = useLocal();
   const text = useRef();
-
   return (
     <div>
       <Box>
@@ -48,12 +46,11 @@ const Nav = (props) => {
         <Box id="nav-franchise">{}</Box>
         <Button
           onClick={(e) => {
-            const localList = searchState('local');
-            const franchiseList = searchState('franchise');
-
+            const local = searchState('local');
+            const franchise = searchState('franchise');
             Router.push({
               pathname: '/result',
-              query: { local: localList, franchise: franchiseList },
+              query: { local: local, franchise: franchise },
             });
           }}
         >
@@ -76,11 +73,10 @@ const addLocal = (ref) => {
 };
 
 const categoryComponent = () =>
-  Object.keys(category['kind']).map((str) => (
+  Object.keys(kind).map((str) => (
     <Link
       href={{
         pathname: '/[menu]',
-        query: { list: category['kind'][str] },
       }}
       as={str}
     >
