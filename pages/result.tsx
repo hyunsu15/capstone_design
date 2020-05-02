@@ -3,15 +3,9 @@ import Head from 'next/head';
 import Nav from '../components/nav';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { kind, crawlerResult } from '../practice/정현수/fakeDB';
-import {
-  AppBar,
-  Typography,
-  Button,
-  Box,
-  TextField,
-  Paper,
-} from '@material-ui/core';
+import { crawlerResult } from '../practice/정현수/fakeDB';
+import { Button, Typography, Paper } from '@material-ui/core';
+
 const Result = () => {
   const router = useRouter();
   console.dir(router);
@@ -24,6 +18,9 @@ const Result = () => {
   if (Array.isArray(franchises) && Array.isArray(local))
     return (
       <div>
+        <Head>
+          <title>프랜차이즈 검색기-검색결과</title>
+        </Head>
         결과
         {local.map(
           (element) =>
@@ -31,6 +28,9 @@ const Result = () => {
         )}
       </div>
     );
+
+  if (local == null) return <div>지역을 골라주세요!!</div>;
+
   return <div>프랜차이즈를 골라주세요!!</div>;
 };
 
@@ -38,28 +38,14 @@ const Result = () => {
 const resultPaper = (local: string, franchises: string[]) => {
   let result = searchResult(local, franchises);
 
-  console.log(result);
   return (
     <Paper>
       {local}
 
-      {Object.keys(result).map((franchise) => {
-        if (result[franchise].length == 0)
-          return <Paper>{franchise} 0개</Paper>;
-        else
-          return (
-            <Paper>
-              {franchise} {result[franchise].length}개
-              {result[franchise].map((element) => {
-                return makeResultPaper(local, element, franchise);
-              })}
-            </Paper>
-          );
-      })}
+      {localResult(result, local)}
     </Paper>
   );
 };
-
 const searchResult = (local: string, franchises: string[]) => {
   let tokens: string[] = local.split(' ');
   let result = {};
@@ -93,17 +79,43 @@ const searchResult = (local: string, franchises: string[]) => {
   });
   return result;
 };
+const localResult = (result, local) => {
+  return Object.keys(result).map((franchise) => {
+    if (result[franchise].length == 0) return <Paper>{franchise} 0개</Paper>;
+    else
+      return (
+        <div>
+          <Button
+            onClick={(e) => {
+              const resultLocations = document.getElementById(
+                `result-${local}-${franchise}`
+              );
+
+              resultLocations.hidden = !resultLocations.hidden;
+            }}
+          >
+            {franchise} {result[franchise].length}개
+          </Button>
+
+          <div hidden={true} id={`result-${local}-${franchise}`}>
+            {result[franchise].map((element) => {
+              return makeResultPaper(local, element, franchise);
+            })}
+          </div>
+        </div>
+      );
+  });
+};
+
 const makeResultPaper = (local, franchise, name) => {
-  console.log(franchise);
-  console.log(name);
   return (
-    <Paper>
+    <div>
       {Object.keys(franchise).map((locationMember) => (
         <div>
           {locationMember}:{franchise[locationMember]}
         </div>
       ))}
-    </Paper>
+    </div>
   );
 };
 
@@ -117,28 +129,3 @@ const franchiseList = () => {
 };
 
 export default Result;
-
-// {
-//   console.log('z', franchises);
-// }
-//
-
-// {
-//   console.log('zz', franchises);
-// }
-
-// Object.keys(crawlerResult[list[0]][copyFranchises[0]]).map((element) => {
-//   tokens = local.split(' ');
-//   if (local.length == 0) return;
-//   const franchiseLocation =
-//     crawlerResult[list[0]][copyFranchises[0]][element];
-//   while (
-//     tokens.length != 0 &&
-//     franchiseLocation['도로명 주소'].includes(tokens[0])
-//   ) {
-//     tokens.shift();
-//   }
-//   if (tokens.length == 0) result.push(franchiseLocation);
-//   list.shift();
-//   copyFranchises.shift();
-// });

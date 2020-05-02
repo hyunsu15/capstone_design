@@ -1,8 +1,12 @@
 import React from 'react';
 import Head from 'next/head';
-import Nav from '../components/nav';
-import Link from 'next/link';
 
-const Home = () => <div></div>;
+const Home = () => (
+  <div>
+    <Head>
+      <title>프랜차이즈 검색기</title>
+    </Head>
+  </div>
+);
 
 export default Home;

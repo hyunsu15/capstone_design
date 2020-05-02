@@ -1,26 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import Nav, { createOption, searchState } from '../components/nav';
-import Link from 'next/link';
+
 import { useRouter } from 'next/router';
 import { type } from 'os';
 import { kind } from '../practice/정현수/fakeDB';
-import {
-  AppBar,
-  Typography,
-  Button,
-  Box,
-  TextField,
-  Paper,
-} from '@material-ui/core';
+import { Button, Box, Paper } from '@material-ui/core';
 
 const menu = () => {
   const router = useRouter();
   const pageName = router.query.menu;
   return (
     <div>
-      {pageName}
+      <Head>
+        <title>프랜차이즈 검색기-{pageName}</title>
+      </Head>
 
+      {pageName}
       {listComponent(pageName)}
     </div>
   );
