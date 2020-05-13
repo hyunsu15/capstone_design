@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-
+import Category from '../components/category';
 const Home = () => (
   <div>
     <Head>

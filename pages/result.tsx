@@ -4,14 +4,18 @@ import Nav from '../components/nav';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { crawlerResult } from '../practice/정현수/fakeDB';
+import useSWR from 'swr';
 import { Button, Typography, Paper } from '@material-ui/core';
+import createSpacing from '@material-ui/core/styles/createSpacing';
+
+const fetcher = (url) => fetch(url).then((r) => r.json());
 
 const Result = () => {
   const router = useRouter();
-  console.dir(router);
-  var local = router.query.local;
-  var franchises = router.query.franchise;
-
+  let local = router.query.local;
+  let franchises = router.query.franchise;
+  const { data, error } = useSWR(process.env.FRANCHISE_HOMEPAGE, fetcher);
+  console.dir(data);
   if (typeof franchises == 'string') franchises = [franchises];
   if (typeof local == 'string') local = [local];
 
@@ -24,7 +28,7 @@ const Result = () => {
         결과
         {local.map(
           (element) =>
-            Array.isArray(franchises) && resultPaper(element, franchises)
+            Array.isArray(franchises) && resultPaper(data, element, franchises)
         )}
       </div>
     );
@@ -35,8 +39,8 @@ const Result = () => {
 };
 
 //franchises.map((franchise) => <div>됨</div>)
-const resultPaper = (local: string, franchises: string[]) => {
-  let result = searchResult(local, franchises);
+const resultPaper = (data, local: string, franchises: string[]) => {
+  let result = searchResult(data, local, franchises);
 
   return (
     <Paper>
@@ -46,7 +50,7 @@ const resultPaper = (local: string, franchises: string[]) => {
     </Paper>
   );
 };
-const searchResult = (local: string, franchises: string[]) => {
+const searchResult = (data, local: string, franchises: string[]) => {
   let tokens: string[] = local.split(' ');
   let result = {};
 
@@ -55,11 +59,10 @@ const searchResult = (local: string, franchises: string[]) => {
   console.log(local, '+', categoryList, '+', franchises);
   let index = 0;
   categoryList.map((category) => {
-    Object.keys(crawlerResult[category][franchises[index]]).map((element) => {
+    Object.keys(data[category][franchises[index]]).map((element) => {
       tokens = local.split(' ');
 
-      const franchiseLocation =
-        crawlerResult[category][franchises[index]][element];
+      const franchiseLocation = data[category][franchises[index]][element];
 
       if (local.length == 0) return;
 
@@ -109,13 +112,13 @@ const localResult = (result, local) => {
 
 const makeResultPaper = (local, franchise, name) => {
   return (
-    <div>
+    <Paper>
       {Object.keys(franchise).map((locationMember) => (
         <div>
           {locationMember}:{franchise[locationMember]}
         </div>
       ))}
-    </div>
+    </Paper>
   );
 };
 

@@ -1,15 +1,14 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Typography, Button, Box, TextField } from '@material-ui/core';
-import { kind } from '../practice/정현수/fakeDB';
 import Router from 'next/router';
-
+import Category from './category';
 const Nav = (props) => {
   const text = useRef();
   return (
     <div>
       <Box>
-        <Typography variant={props.variant} align="center">
+        <Typography variant="h3" align="center">
           프랜차이즈 맵
         </Typography>
         <TextField
@@ -30,6 +29,7 @@ const Nav = (props) => {
           onClick={(e) => {
             const local = searchState('local');
             const franchise = searchState('franchise');
+
             Router.push({
               pathname: '/result',
               query: { local: local, franchise: franchise },
@@ -39,22 +39,10 @@ const Nav = (props) => {
           검색
         </Button>
       </Box>
-
-      {categoryComponent()}
+      {Category()}
     </div>
   );
 };
-const categoryComponent = () =>
-  Object.keys(kind).map((str) => (
-    <Link
-      href={{
-        pathname: '/[menu]',
-      }}
-      as={str}
-    >
-      <a>{str}</a>
-    </Link>
-  ));
 
 const addLocal = (ref) => {
   const text = ref.current.value;
