@@ -22,6 +22,7 @@ const Home = ({ kind }) => {
             <a>{category}</a>
           </Link>
         ))}
+      {console.log('env', process.env.KIND_PAGE)}
     </div>
   );
 };
