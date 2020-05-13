@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import fetch from 'unfetch';
+import fetch from 'isomorphic-unfetch';
 
 import useSWR from 'swr';
 
-const fetcher = (url) => fetch(url).then((r) => r.json());
-const Category = () => {
+const fetcher = async (url) => {
+  const res = await fetch(url);
+  return res.json();
+};
+
+const Category = (datas?) => {
   const { data, error } = useSWR(process.env.KIND_HOMEPAGE, fetcher);
   if (error) return <div>error</div>;
   if (!data) return <div>loading</div>;
