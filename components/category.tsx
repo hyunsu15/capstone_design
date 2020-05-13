@@ -7,6 +7,8 @@ import useSWR from 'swr';
 const fetcher = (url) => fetch(url).then((r) => r.json());
 const Category = () => {
   const { data, error } = useSWR(process.env.KIND_HOMEPAGE, fetcher);
+  if (error) return <div>error</div>;
+  if (!data) return <div>loading</div>;
   if (data)
     return Object.keys(data).map((category) => (
       <Link
@@ -18,7 +20,7 @@ const Category = () => {
         <a>{category}</a>
       </Link>
     ));
-  else return error;
+  else return <div>xczsd</div>;
 };
 
 export default Category;

@@ -15,7 +15,9 @@ const Result = () => {
   let local = router.query.local;
   let franchises = router.query.franchise;
   const { data, error } = useSWR(process.env.FRANCHISE_HOMEPAGE, fetcher);
-  console.dir(data);
+
+  if (error) return <div>error</div>;
+  if (!data) return <div>loading</div>;
   if (typeof franchises == 'string') franchises = [franchises];
   if (typeof local == 'string') local = [local];
 
