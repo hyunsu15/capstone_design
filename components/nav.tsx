@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Typography, Button, Box, TextField } from '@material-ui/core';
 import Router from 'next/router';
-
+import Category from './Cagetory';
 const Nav = (props) => {
   const text = useRef();
   return (
@@ -39,6 +39,7 @@ const Nav = (props) => {
           검색
         </Button>
       </Box>
+      {Category()}
     </div>
   );
 };
