@@ -1,0 +1,19 @@
+ .franchise_name {
+     padding-top: 0.5%;
+     padding-bottom: 0.5%;
+ }
+
+ .franchise_paper, .inform_paper {
+     padding-top: 0.5%;
+     padding-bottom: 0.5%;
+     margin-bottom: 1%;
+ }
+
+ .inform {
+     margin-bottom: 1%;
+ }
+
+ #inform_0 {
+     font-weight: bold;
+     font-size: large;
+ }

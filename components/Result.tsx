@@ -1,65 +1,53 @@
 import React, { useState } from 'react';
-import Head from 'next/head';
-import Nav from '../components/nav';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { crawlerResult } from '../practice/정현수/fakeDB';
+import { Button, Box, Paper } from '@material-ui/core';
 import useSWR from 'swr';
-import { Button, Typography, Paper } from '@material-ui/core';
-import createSpacing from '@material-ui/core/styles/createSpacing';
-
-const fetcher = (url) => fetch(url).then((r) => r.json());
-
-const Result = () => {
-  const router = useRouter();
-  let local = router.query.local;
-  let franchises = router.query.franchise;
-  const { data, error } = useSWR(process.env.FRANCHISE_HOMEPAGE, fetcher);
-
-  if (error) return <div>error</div>;
-  if (!data) return <div>loading</div>;
-  if (typeof franchises == 'string') franchises = [franchises];
-  if (typeof local == 'string') local = [local];
-
-  if (Array.isArray(franchises) && Array.isArray(local))
-    return (
-      <div>
-        <Head>
-          <title>프랜차이즈 검색기-검색결과</title>
-        </Head>
-        결과
-        {local.map(
-          (element) =>
-            Array.isArray(franchises) && resultPaper(data, element, franchises)
-        )}
-      </div>
-    );
-
-  if (local == null) return <div>지역을 골라주세요!!</div>;
-
-  return <div>프랜차이즈를 골라주세요!!</div>;
+import fetcher from '../lib/fetcher';
+import style from './Result.module.css';
+import grey from '@material-ui/core/colors/grey';
+const isError = (str: string) => {
+  return <Box p={3}>{`${str}를 골라주세요`}</Box>;
 };
 
-//franchises.map((franchise) => <div>됨</div>)
-const resultPaper = (data, local: string, franchises: string[]) => {
+const Result = (props) => {
+  const { local, franchise } = props;
+  const { data, error } = useSWR(process.env.FRANCHISE_HOMEPAGE, fetcher);
+
+  if (local.length == 0) return isError('지역');
+  if (franchise.length == 0) return isError('프랜차이즈');
+  if (error) return <div>error</div>;
+  if (!data) return <div>loading</div>;
+
+  return (
+    <Box p={3} className={style.box}>
+      {local.map((element, index) =>
+        resultPaper(data, element, franchise, index)
+      )}
+    </Box>
+  );
+};
+
+const resultPaper = (data, local: string, franchises: string[], index) => {
   let result = searchResult(data, local, franchises);
 
   return (
-    <Paper>
+    <Box className={style.result_margin} style={{ backgroundColor: grey[200] }}>
       {local}
 
       {localResult(result, local)}
-    </Paper>
+    </Box>
   );
 };
 const searchResult = (data, local: string, franchises: string[]) => {
   let tokens: string[] = local.split(' ');
   let result = {};
 
-  const categoryList = franchiseList();
-
-  console.log(local, '+', categoryList, '+', franchises);
+  let categoryList = franchiseList(franchises);
   let index = 0;
+
+  let error = tokens.filter((element) => element.length <= 1);
+  if (error.length >= 1) return result;
+  if (parseInt(local)) return result;
+
   categoryList.map((category) => {
     Object.keys(data[category][franchises[index]]).map((element) => {
       tokens = local.split(' ');
@@ -85,9 +73,12 @@ const searchResult = (data, local: string, franchises: string[]) => {
   return result;
 };
 const localResult = (result, local) => {
+  let zero = Object.keys(result).filter((x) => result[x].length != 0);
+  if (zero.length == 0)
+    return <span className={style.error}>존재하지않음</span>;
+
   return Object.keys(result).map((franchise) => {
-    if (result[franchise].length == 0) return <Paper>{franchise} 0개</Paper>;
-    else
+    if (result[franchise].length >= 1)
       return (
         <div>
           <Button
@@ -99,10 +90,15 @@ const localResult = (result, local) => {
               resultLocations.hidden = !resultLocations.hidden;
             }}
           >
-            {franchise} {result[franchise].length}개
+            {franchise}
+            {` ${result[franchise].length}개`}
           </Button>
 
-          <div hidden={true} id={`result-${local}-${franchise}`}>
+          <div
+            hidden={true}
+            id={`result-${local}-${franchise}`}
+            className={style.result_margin}
+          >
             {result[franchise].map((element) => {
               return makeResultPaper(local, element, franchise);
             })}
@@ -111,24 +107,31 @@ const localResult = (result, local) => {
       );
   });
 };
-
 const makeResultPaper = (local, franchise, name) => {
   return (
-    <Paper>
+    <Paper variant="outlined" square className={style.result_margin}>
       {Object.keys(franchise).map((locationMember) => (
-        <div>
-          {locationMember}:{franchise[locationMember]}
+        <div className={style.result_paper_item}>
+          {locationMember}:
+          {franchise[locationMember] == ''
+            ? '미지원'
+            : franchise[locationMember]}
         </div>
       ))}
     </Paper>
   );
 };
 
-const franchiseList = () => {
-  const list = [];
+const franchiseList = (state: string[]) => {
+  let list = [];
+
   document
     .getElementById('nav-franchise')
-    .childNodes.forEach((element) => list.push(element['id']));
+    .childNodes.forEach(
+      (element) =>
+        state.includes(element.childNodes[0].textContent.trim()) &&
+        list.push(element['id'])
+    );
 
   return list;
 };

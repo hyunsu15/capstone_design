@@ -1,79 +1,98 @@
 import React, { useRef } from 'react';
-import Link from 'next/link';
-import { Typography, Button, Box, TextField } from '@material-ui/core';
-import Router from 'next/router';
-import Category from './Cagetory';
+import {
+  Toolbar,
+  Grid,
+  Typography,
+  Button,
+  Box,
+  TextField,
+} from '@material-ui/core';
+
+import style from './nav.module.css';
+import { createOption } from '../lib/createEvent';
+
 const Nav = (props) => {
   const text = useRef();
+  const { setIndex, local, setLocal } = props;
   return (
-    <div>
+    <div className={style.nav}>
       <Box>
-        <Typography variant="h3" align="center">
-          프랜차이즈 맵
-        </Typography>
-        <TextField
-          inputRef={text}
-          style={{ width: '33%' }}
-          size="small"
-          label="지역검색"
-        />
-        <Button onClick={(e) => addLocal(text)}>추가</Button>
-
-        <Typography variant="h5">지역:</Typography>
-        <Box id="nav-local"></Box>
-
-        <Typography variant="h5">프랜차이즈:</Typography>
-        <Box id="nav-franchise">{}</Box>
-
-        <Button
-          onClick={(e) => {
-            const local = searchState('local');
-            const franchise = searchState('franchise');
-
-            Router.push({
-              pathname: '/result',
-              query: { local: local, franchise: franchise },
-            });
-          }}
-        >
-          검색
-        </Button>
+        {title()}
+        {localTextField(text, local, setLocal, setIndex)}
+        {stateInterface(setIndex)}
       </Box>
-      {Category()}
     </div>
   );
 };
 
-const addLocal = (ref) => {
-  const text = ref.current.value;
-  const local = searchState('local');
-  const isContain = local.indexOf(text) != -1 ? true : false;
-  if (!isContain) {
-    createOption('local', text);
-  }
+const title = () => (
+  <Typography variant="h6" align="center">
+    프랜차이즈 맵
+  </Typography>
+);
+
+const localTextField = (text, local, setLocal, setIndex) => (
+  <Grid container justify="center">
+    <TextField
+      inputRef={text}
+      style={{ width: '33%' }}
+      size="small"
+      label="지역검색"
+    />
+    <Button onClick={(e) => addLocal(text, local, setLocal, setIndex)}>
+      추가
+    </Button>
+  </Grid>
+);
+
+const stateInterface = (setIndex) => (
+  <div>
+    <Toolbar className={style.nav_second}>
+      <Typography variant="h5" align="center" className={style.state_inner}>
+        지역:
+      </Typography>
+
+      <Box id="nav-local" className={style.state_inner}></Box>
+
+      <Typography variant="h5" className={style.state_inner}>
+        프랜차이즈:
+      </Typography>
+
+      <Box id="nav-franchise" className={style.state_inner}>
+        {}
+      </Box>
+
+      <Button
+        onClick={(e) => {
+          setIndex(-1);
+        }}
+        className={style.state_inner}
+      >
+        검색
+      </Button>
+    </Toolbar>
+  </div>
+);
+
+const addLocal = (ref, local, setLocal, setIndex) => {
+  const text = ref.current.value.trim();
+
+  if (isError(text)) {
+    ref.current.value = 'Error';
+    setIndex(0);
+  } else if (local.indexOf(text) == -1)
+    createOption('local', text, local, setLocal, null);
 };
 
-export const createOption = (parentId, text, id?) => {
-  const childText = document.createElement('div');
-  const button = document.createElement('span');
-  button.innerHTML = 'ㅡ';
-  childText.innerHTML = text + ' ';
-  childText.appendChild(button);
-  childText.className = 'h3';
-  if (id) childText.setAttribute('id', id);
-  document.getElementById(`nav-${parentId}`).appendChild(childText);
+const isError = (text) => {
+  const check_unCompletedKor = /[ㄱ-ㅎ|ㅏ-ㅣ]/.test(text);
+  const check_spc = /[~!@#$%^&*()_+|<>?:{}]/.test(text);
+  const check_eng = /[a-zA-Z]/.test(text);
+  const wrongWord = check_eng || check_spc || check_unCompletedKor;
 
-  button.onclick = () => {
-    button.parentElement.parentElement.removeChild(button.parentElement);
-  };
-};
-
-export const searchState = (option) => {
-  const list = [];
-  document.getElementById(`nav-${option}`).childNodes.forEach((element) => {
-    list.push(element.childNodes[0].nodeValue.trim());
-  });
-  return list;
+  return wrongWord || text.length == 1 || text == '' || parseInt(text)
+    ? true
+    : false;
 };
 
 export default Nav;
