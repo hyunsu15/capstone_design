@@ -9,10 +9,10 @@
 2. <strong> 실행법</strong>
    1. server폴더에 있는 백엔드 서버를 킨다. (정보업데이트 필요시, 파이썬 코드를 실행하여 크롤링이 끝난후에 서버를 킨다.)
    
-   1. 다운을 받은 후에, 루트 폴더에 .env를 만들어서 아래 예시에 있는 두개의 환경변수를 지정해준다.<br>
+   2. 다운을 받은 후에, 루트 폴더에 .env를 만들어서 아래 예시에 있는 두개의 환경변수를 지정해준다.<br>
    ex)<br>
    KIND_HOMEPAGE = https://서버주소/kind<br>
    FRANCHISE_HOMEPAGE = https://서버주소/category<br>
     
    
-   1. 명령쉘에서 yarn 으로 패키지를 설치한후,yarn dev를 하면됩니다.
+   3. 명령쉘에서 yarn 으로 패키지를 설치한후,yarn dev를 하면됩니다.
